@@ -12,6 +12,29 @@
     flake-parts,
   }:
     flake-parts.lib.mkFlake {inherit inputs;} {
+      systems = [
+        "x86_64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+        "aarch64-linux"
+      ];
+      perSystem = {system, ...}: let
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [
+            self.overlays.default
+          ];
+        };
+        luarc = pkgs.mk-luarc-json {
+          plugins = with pkgs.vimPlugins; [telescope-nvim fidget-nvim];
+        };
+      in {
+        devShells.default = pkgs.mkShell {
+          shellHook = ''
+            ln -fs ${pkgs.luarc-to-json luarc} .luarc.json
+          '';
+        };
+      };
       flake = {
         overlays.default = final: prev: {
           mk-luarc = {
@@ -21,15 +44,14 @@
             plugins ? [],
             lua-version ? "5.1",
           }: let
-            lib = final.lib;
             partitions = builtins.partition (plugin:
-                builtins.hasAttr "vimPlugin" plugin
-                && plugin.vimPlugin
-                || plugin.pname == "nvim-treesitter")
-              plugins;
-            plugins = partitions.right;
+              builtins.hasAttr "vimPlugin" plugin
+              && plugin.vimPlugin
+              || plugin.pname == "nvim-treesitter")
+            plugins;
+            nvim-plugins = partitions.right;
             rocks = partitions.wrong;
-            plugin-luadirs = builtins.map (plugin: "${plugin}/lua") plugins;
+            plugin-luadirs = builtins.map (plugin: "${plugin}/lua") nvim-plugins;
             pkg-libdirs = builtins.map (pkg: "${pkg}/lib/lua/${lua-version}") rocks;
             pkg-sharedirs = builtins.map (pkg: "${pkg}/share/lua/${lua-version}") rocks;
           in {
@@ -64,7 +86,8 @@
               };
             };
           };
-          luarc-to-json = luarc: final.runCommand ".luarc.json" {
+          luarc-to-json = luarc:
+            final.runCommand ".luarc.json" {
               buildInputs = [
                 final.jq
               ];
