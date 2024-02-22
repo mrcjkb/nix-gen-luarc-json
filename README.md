@@ -1,5 +1,18 @@
 # nix-gen-luarc-json
+
 Generate a .luarc.json for Lua/Neovim devShells
+
+## Usage
+
+Apply this flake's overlay.
+It provides a `mk-luarc-json` function,
+which takes an attrset with the following arguments:
+
+- `nvim`: The neovim package. Defaults to `neovim-unwrapped`.
+- `neodev-types`: neodev.nvim types to add to the `workspace.library`.
+  Defaults to `"stable"`.
+- Plugins: List of Neovim plugins and/or luarocks packages.
+  Defaults to an empty list.
 
 ## License
 
