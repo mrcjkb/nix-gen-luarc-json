@@ -11,8 +11,9 @@ which takes an attrset with the following arguments:
 - `nvim`: The neovim package. Defaults to `neovim-unwrapped`.
 - `neodev-types`: neodev.nvim types to add to the `workspace.library`.
   Defaults to `"stable"`.
-- Plugins: List of Neovim plugins and/or luarocks packages.
+- `plugins`: List of Neovim plugins and/or luarocks packages.
   Defaults to an empty list.
+- `lua-version`: Defaults to `"5.1"`.
 
 Example:
 
