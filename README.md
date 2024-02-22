@@ -14,6 +14,36 @@ which takes an attrset with the following arguments:
 - Plugins: List of Neovim plugins and/or luarocks packages.
   Defaults to an empty list.
 
+Example:
+
+Import this flake:
+
+```nix
+#flake.nix
+inputs.gen-luarc.url = "github:mrcjkb/nix-gen-luarc-json";
+```
+
+Add the overlay:
+
+```nix
+pkgs = import nixpkgs {
+  inherit system;
+  overlays = [
+    gen-luarc.overlays.default
+  ];
+};
+```
+
+Generate a `.luarc.json` in your `shellHook`:
+
+```nix
+shellHook = let
+  luarc = pkgs.mk-luarc-json { plugins = with pkgs.vimPlugins; [ nvim-treesitter ]; };
+in /* bash */ ''
+  ln -fs {luarc} .luarc.json
+'';
+```
+
 ## License
 
 This flake is [licensed according to GPL version 2](./LICENSE),
