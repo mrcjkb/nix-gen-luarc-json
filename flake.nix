@@ -14,7 +14,7 @@
     flake-parts.lib.mkFlake {inherit inputs;} {
       flake = {
         overlays.default = final: prev: {
-          mk-luarc-json = {
+          mk-luarc = {
             # list of plugins that have a /lua directory
             nvim ? final.neovim-unwrapped,
             neodev-types ? "stable",
@@ -29,38 +29,37 @@
               then "${plugin}/lua"
               else "${plugin}/lib/lua/5.1")
             plugins;
-            luarc = {
-              runtime.version = "LuaJIT";
-              Lua = {
-                globals = [
-                  "vim"
+          in {
+            runtime.version = "LuaJIT";
+            Lua = {
+              globals = [
+                "vim"
+              ];
+              workspace = {
+                library =
+                  [
+                    "${nvim}/share/nvim/runtime/lua"
+                    "${final.vimPlugins.neodev-nvim}/types/${neodev-types}"
+                    "\${3rd}/busted/library"
+                    "\${3rd}/luassert/library"
+                  ]
+                  ++ plugin-lib-dirs;
+                ignoreDir = [
+                  ".git"
+                  ".github"
+                  ".direnv"
+                  "result"
+                  "nix"
+                  "doc"
                 ];
-                workspace = {
-                  library =
-                    [
-                      "${nvim}/share/nvim/runtime/lua"
-                      "${final.vimPlugins.neodev-nvim}/types/${neodev-types}"
-                      "\${3rd}/busted/library"
-                      "\${3rd}/luassert/library"
-                    ]
-                    ++ plugin-lib-dirs;
-                  ignoreDir = [
-                    ".git"
-                    ".github"
-                    ".direnv"
-                    "result"
-                    "nix"
-                    "doc"
-                  ];
-                };
-                diagnostics = {
-                  libraryFiles = "Disable";
-                  disable = [];
-                };
+              };
+              diagnostics = {
+                libraryFiles = "Disable";
+                disable = [];
               };
             };
-          in
-            final.runCommand ".luarc.json" {
+          };
+          luarc-to-json = luarc: final.runCommand ".luarc.json" {
               buildInputs = [
                 final.jq
               ];
@@ -71,6 +70,7 @@
                 jq . <"$rawJSONPath"
               } >$out
             '';
+          mk-luarc-json = attrs: final.luarc-to-json (final.mk-luarc attrs);
         };
       };
     };
