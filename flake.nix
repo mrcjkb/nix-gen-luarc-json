@@ -46,9 +46,8 @@
             disabled-diagnostics ? [],
           }: let
             partitions = builtins.partition (plugin:
-              builtins.hasAttr "vimPlugin" plugin
-              && plugin.vimPlugin
-              || plugin.pname == "nvim-treesitter")
+              plugin.vimPlugin or false
+              || plugin.pname or "" == "nvim-treesitter")
             plugins;
             nvim-plugins = partitions.right;
             rocks = partitions.wrong;
