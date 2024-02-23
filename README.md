@@ -14,6 +14,7 @@ which takes an attrset with the following arguments:
 - `plugins`: List of Neovim plugins and/or luarocks packages.
   Defaults to an empty list.
 - `lua-version`: Defaults to `"5.1"`.
+- `disabled-diagnostics`: Defaults to an empty list..
 
 Example:
 

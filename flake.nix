@@ -43,6 +43,7 @@
             neodev-types ? "stable",
             plugins ? [],
             lua-version ? "5.1",
+            disabled-diagnostics ? [],
           }: let
             partitions = builtins.partition (plugin:
               builtins.hasAttr "vimPlugin" plugin
@@ -82,7 +83,7 @@
               };
               diagnostics = {
                 libraryFiles = "Disable";
-                disable = [];
+                disable = disabled-diagnostics;
               };
             };
           };
