@@ -45,10 +45,19 @@
             lua-version ? "5.1",
             disabled-diagnostics ? [],
           }: let
+            pluginPackages =
+              map (
+                x:
+                  if x ? plugin
+                  then x.plugin
+                  else x
+              )
+              plugins;
             partitions = builtins.partition (plugin:
-              plugin.vimPlugin or false
+              plugin.vimPlugin
+              or false
               || plugin.pname or "" == "nvim-treesitter")
-            plugins;
+            pluginPackages;
             nvim-plugins = partitions.right;
             rocks = partitions.wrong;
             plugin-luadirs = builtins.map (plugin: "${plugin}/lua") nvim-plugins;
