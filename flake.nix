@@ -40,7 +40,6 @@
           mk-luarc = {
             # list of plugins that have a /lua directory
             nvim ? final.neovim-unwrapped,
-            neodev-types ? "stable",
             plugins ? [],
             lua-version ? "5.1",
             disabled-diagnostics ? [],
@@ -73,7 +72,6 @@
                 library =
                   [
                     "${nvim}/share/nvim/runtime/lua"
-                    "${final.vimPlugins.neodev-nvim}/types/${neodev-types}"
                     "\${3rd}/busted/library"
                     "\${3rd}/luassert/library"
                   ]
