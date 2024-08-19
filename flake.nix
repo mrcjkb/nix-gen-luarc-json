@@ -60,7 +60,7 @@
       };
       flake = {
         overlays.default = final: prev: let
-            lib = final.lib;
+          lib = final.lib;
         in {
           mk-luarc = {
             # list of plugins that have a /lua directory
