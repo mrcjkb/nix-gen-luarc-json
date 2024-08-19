@@ -4,12 +4,17 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    luvit-meta = {
+      url = "github:Bilal2453/luvit-meta";
+      flake = false;
+    };
   };
 
   outputs = inputs @ {
     self,
     nixpkgs,
     flake-parts,
+    luvit-meta,
   }:
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = [
@@ -36,11 +41,16 @@
         };
       };
       flake = {
-        overlays.default = final: prev: {
+        overlays.default = final: prev: let
+            lib = final.lib;
+        in {
           mk-luarc = {
             # list of plugins that have a /lua directory
             nvim ? final.neovim-unwrapped,
             plugins ? [],
+            meta ? {
+              luvit = true;
+            },
             lua-version ? "5.1",
             disabled-diagnostics ? [],
           }: let
@@ -77,7 +87,8 @@
                   ]
                   ++ plugin-luadirs
                   ++ pkg-libdirs
-                  ++ pkg-sharedirs;
+                  ++ pkg-sharedirs
+                  ++ (lib.optional (meta.luvit or false) "${luvit-meta}/library");
                 ignoreDir = [
                   ".git"
                   ".github"
