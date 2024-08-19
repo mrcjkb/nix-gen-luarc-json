@@ -8,6 +8,10 @@
       url = "github:Bilal2453/luvit-meta";
       flake = false;
     };
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {
@@ -15,6 +19,7 @@
     nixpkgs,
     flake-parts,
     luvit-meta,
+    git-hooks,
   }:
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = [
@@ -33,11 +38,24 @@
         luarc = pkgs.mk-luarc-json {
           plugins = with pkgs.vimPlugins; [telescope-nvim fidget-nvim];
         };
+        git-hooks-check = git-hooks.lib.${system}.run {
+          src = self;
+          hooks = {
+            alejandra.enable = true;
+            editorconfig-checker.enable = true;
+          };
+        };
       in {
         devShells.default = pkgs.mkShell {
+          name = "gen-luarc devShell";
+          buildInputs = self.checks.${system}.git-hooks-check.enabledPackages;
           shellHook = ''
             ln -fs ${pkgs.luarc-to-json luarc} .luarc.json
           '';
+        };
+        checks = rec {
+          default = git-hooks-check;
+          inherit git-hooks-check;
         };
       };
       flake = {
