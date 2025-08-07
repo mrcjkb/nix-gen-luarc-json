@@ -91,35 +91,29 @@
             pkg-libdirs = builtins.map (pkg: "${pkg}/lib/lua/${lua-version}") rocks;
             pkg-sharedirs = builtins.map (pkg: "${pkg}/share/lua/${lua-version}") rocks;
           in {
-            runtime.version = "LuaJIT";
-            Lua = {
-              globals = [
-                "vim"
+            workspace = {
+              library =
+                [
+                  "${nvim}/share/nvim/runtime/lua"
+                  "\${3rd}/busted/library"
+                  "\${3rd}/luassert/library"
+                ]
+                ++ plugin-luadirs
+                ++ pkg-libdirs
+                ++ pkg-sharedirs
+                ++ (lib.optional (meta.luvit or false) "${luvit-meta}/library");
+              ignoreDir = [
+                ".git"
+                ".github"
+                ".direnv"
+                "result"
+                "nix"
+                "doc"
               ];
-              workspace = {
-                library =
-                  [
-                    "${nvim}/share/nvim/runtime/lua"
-                    "\${3rd}/busted/library"
-                    "\${3rd}/luassert/library"
-                  ]
-                  ++ plugin-luadirs
-                  ++ pkg-libdirs
-                  ++ pkg-sharedirs
-                  ++ (lib.optional (meta.luvit or false) "${luvit-meta}/library");
-                ignoreDir = [
-                  ".git"
-                  ".github"
-                  ".direnv"
-                  "result"
-                  "nix"
-                  "doc"
-                ];
-              };
-              diagnostics = {
-                libraryFiles = "Disable";
-                disable = disabled-diagnostics;
-              };
+            };
+            diagnostics = {
+              libraryFiles = "Disable";
+              disable = disabled-diagnostics;
             };
           };
           luarc-to-json = luarc:
