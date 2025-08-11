@@ -69,6 +69,7 @@
             meta ? {
               luvit = true;
             },
+            # 5.1, 5.2, 5.3, 5.4, ... , jit51, jit52
             lua-version ? "5.1",
             disabled-diagnostics ? [],
           }: let
@@ -87,10 +88,21 @@
             pluginPackages;
             nvim-plugins = partitions.right;
             rocks = partitions.wrong;
+            lua-version-dir =
+              if lua-version == "jit51"
+              then "5.1"
+              else if lua-version == "jit52"
+              then "5.2"
+              else lua-version;
+            runtime-version-str =
+              if lua-version == "jit51" || lua-version == "jit52"
+              then "LuaJIT"
+              else "Lua ${lua-version}";
             plugin-luadirs = builtins.map (plugin: "${plugin}/lua") nvim-plugins;
-            pkg-libdirs = builtins.map (pkg: "${pkg}/lib/lua/${lua-version}") rocks;
-            pkg-sharedirs = builtins.map (pkg: "${pkg}/share/lua/${lua-version}") rocks;
+            pkg-libdirs = builtins.map (pkg: "${pkg}/lib/lua/${lua-version-dir}") rocks;
+            pkg-sharedirs = builtins.map (pkg: "${pkg}/share/lua/${lua-version-dir}") rocks;
           in {
+            runtime.version = runtime-version-str;
             workspace = {
               library =
                 [
