@@ -40,7 +40,7 @@ Generate a `.luarc.json` in your `shellHook`:
 shellHook = let
   luarc = pkgs.mk-luarc-json { plugins = with pkgs.vimPlugins; [ nvim-treesitter ]; };
 in /* bash */ ''
-  ln -fs {luarc} .luarc.json
+  ln -fs ${luarc} .luarc.json
 '';
 ```
 
